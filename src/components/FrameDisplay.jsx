@@ -63,7 +63,7 @@ const FrameDisplay = ({ frames, uniqueId }) => {
             <img
               src={
                 uniqueId
-                  ? `${BACKEND_URL}}/get-frame/${uniqueId}/${selectedImage}`
+                  ? `${BACKEND_URL}/get-frame/${uniqueId}/${selectedImage}`
                   : selectedImage
               }
               alt="Full-size frame"

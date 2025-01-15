@@ -31,7 +31,7 @@ const FileUpload = ({ onUploadSuccess }) => {
     formData.append("threshold", threshold);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}}/extract-frames`, formData, {
+      const response = await axios.post(`${BACKEND_URL}/extract-frames`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
