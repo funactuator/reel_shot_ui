@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import FileUpload from "./components/FileUpload";
 import FrameDisplay from "./components/FrameDisplay";
-import { saveFrame, getAllFrames } from "./utils/idb";
+import { saveFrame, getAllFrames, deleteFrame } from "./utils/idb";
 
 const App = () => {
   const [frames, setFrames] = useState({});
@@ -16,7 +16,28 @@ const App = () => {
     const checkFramesInIndexedDB = async () => {
       const frames = await getAllFrames();
       setHasFramesInIndexedDB(frames.length > 0);
+
+      // Verify if the images are still available on the backend
+      const validFrames = {};
+      for (const frame of frames) {
+        try {
+          const response = await fetch(`http://localhost:8000${frame.url}`);
+          if (response.ok) {
+            validFrames[frame.id + "_" + frame.name] = `http://localhost:8000${frame.url}`;
+          } else {
+            // If the image is not available, remove it from IndexedDB
+            await deleteFrame(frame.id);
+          }
+        } catch (error) {
+          console.error("Error fetching image:", error);
+          await deleteFrame(frame.id); // Remove the frame if there's an error
+        }
+      }
+
+      // Update the state with valid frames
+      setAllFrames(validFrames);
     };
+
     checkFramesInIndexedDB();
   }, []);
 
@@ -45,7 +66,7 @@ const App = () => {
   const handleViewAllFiles = async () => {
     const frames = await getAllFrames();
     const framesMap = frames.reduce((acc, frame) => {
-      acc[frame.id + '_' + frame.name] = 'http://localhost:8000' + frame.url;
+      acc[frame.id + "_" + frame.name] = `http://localhost:8000${frame.url}`;
       return acc;
     }, {});
     setAllFrames(framesMap);
@@ -78,7 +99,9 @@ const App = () => {
         </div>
 
         {/* File Upload Section */}
-        {!isProcessingComplete && !showAllFrames && <FileUpload onUploadSuccess={handleUploadSuccess} />}
+        {!isProcessingComplete && !showAllFrames && (
+          <FileUpload onUploadSuccess={handleUploadSuccess} />
+        )}
 
         {/* Display Frames */}
         {isProcessingComplete && !showAllFrames && (

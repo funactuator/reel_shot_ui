@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
 const FileUpload = ({ onUploadSuccess }) => {
@@ -50,7 +50,7 @@ const FileUpload = ({ onUploadSuccess }) => {
             Video File
           </label>
           <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center px-4 py-6 bg-blue-50 text-blue-700 rounded-lg shadow-sm tracking-wide border border-blue-200 cursor-pointer hover:bg-blue-100 transition duration-300">
+            <label className="flex flex-col w-full items-center px-4 py-6 bg-blue-50 text-blue-700 rounded-lg shadow-sm tracking-wide border border-blue-200 cursor-pointer hover:bg-blue-100 transition duration-300">
               <svg
                 className="w-8 h-8"
                 fill="currentColor"

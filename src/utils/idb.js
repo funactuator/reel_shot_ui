@@ -25,3 +25,8 @@ export const getAllFrames = async () => {
   const db = await initDB();
   return db.getAll(STORE_NAME);
 };
+
+export const deleteFrame = async (id) => {
+  const db = await initDB();
+  return db.delete(STORE_NAME, id);
+};
