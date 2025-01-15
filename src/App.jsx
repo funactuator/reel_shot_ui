@@ -3,6 +3,9 @@ import FileUpload from "./components/FileUpload";
 import FrameDisplay from "./components/FrameDisplay";
 import { saveFrame, getAllFrames, deleteFrame } from "./utils/idb";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+
+
 const App = () => {
   const [frames, setFrames] = useState({});
   const [isProcessingComplete, setIsProcessingComplete] = useState(false);
@@ -21,9 +24,9 @@ const App = () => {
       const validFrames = {};
       for (const frame of frames) {
         try {
-          const response = await fetch(`http://localhost:8000${frame.url}`);
+          const response = await fetch(`${BACKEND_URL}${frame.url}`);
           if (response.ok) {
-            validFrames[frame.id + "_" + frame.name] = `http://localhost:8000${frame.url}`;
+            validFrames[frame.id + "_" + frame.name] = `${BACKEND_URL}${frame.url}`;
           } else {
             // If the image is not available, remove it from IndexedDB
             await deleteFrame(frame.id);
@@ -66,7 +69,7 @@ const App = () => {
   const handleViewAllFiles = async () => {
     const frames = await getAllFrames();
     const framesMap = frames.reduce((acc, frame) => {
-      acc[frame.id + "_" + frame.name] = `http://localhost:8000${frame.url}`;
+      acc[frame.id + "_" + frame.name] = `${BACKEND_URL}${frame.url}`;
       return acc;
     }, {});
     setAllFrames(framesMap);
@@ -76,9 +79,10 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
-          Video Frame Extractor
+        <h1 className="text-4xl font-bold text-center text-gray-900 mb-4">
+          Reel Shots
         </h1>
+        <h3 className="text-xl font-bold text-center text-gray-500 mb-8">Capture screenshots of Instagram Reels</h3>
 
         {/* Header with Buttons */}
         <div className="flex justify-center space-x-4 mb-8">
