@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 const FrameDisplay = ({ frames, uniqueId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+
 
   const openModal = (imageUrl) => {
     setSelectedImage(imageUrl);
@@ -43,7 +45,7 @@ const FrameDisplay = ({ frames, uniqueId }) => {
             <img
               src={
                 uniqueId
-                  ? `http://127.0.0.1:8000/get-frame/${uniqueId}/${name}`
+                  ? `${BACKEND_URL}/get-frame/${uniqueId}/${name}`
                   : url
               }
               alt={name}
@@ -61,7 +63,7 @@ const FrameDisplay = ({ frames, uniqueId }) => {
             <img
               src={
                 uniqueId
-                  ? `http://127.0.0.1:8000/get-frame/${uniqueId}/${selectedImage}`
+                  ? `${BACKEND_URL}}/get-frame/${uniqueId}/${selectedImage}`
                   : selectedImage
               }
               alt="Full-size frame"

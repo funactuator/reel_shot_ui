@@ -12,6 +12,9 @@ const FileUpload = ({ onUploadSuccess }) => {
     setFile(e.target.files[0]);
   };
 
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
@@ -28,7 +31,7 @@ const FileUpload = ({ onUploadSuccess }) => {
     formData.append("threshold", threshold);
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/extract-frames", formData, {
+      const response = await axios.post(`${BACKEND_URL}}/extract-frames`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
