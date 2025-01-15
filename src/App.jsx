@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FileUpload from "./components/FileUpload";
 import FrameDisplay from "./components/FrameDisplay";
 import { saveFrame, getAllFrames } from "./utils/idb";
@@ -9,9 +9,18 @@ const App = () => {
   const [allFrames, setAllFrames] = useState({});
   const [showAllFrames, setShowAllFrames] = useState(false);
   const [uniqueId, setUniqueId] = useState(null);
+  const [hasFramesInIndexedDB, setHasFramesInIndexedDB] = useState(false);
+
+  // Check if there are frames in IndexedDB on initial load
+  useEffect(() => {
+    const checkFramesInIndexedDB = async () => {
+      const frames = await getAllFrames();
+      setHasFramesInIndexedDB(frames.length > 0);
+    };
+    checkFramesInIndexedDB();
+  }, []);
 
   const handleUploadSuccess = async (response) => {
-    console.log(response);
     const { unique_id, frames } = response;
     setFrames(frames);
     setIsProcessingComplete(true);
@@ -21,6 +30,9 @@ const App = () => {
     for (const [name, url] of Object.entries(frames)) {
       await saveFrame({ name, url, unique_id });
     }
+
+    // Update the state to indicate there are frames in IndexedDB
+    setHasFramesInIndexedDB(true);
   };
 
   const handleTryAnotherVideo = () => {
@@ -33,7 +45,7 @@ const App = () => {
   const handleViewAllFiles = async () => {
     const frames = await getAllFrames();
     const framesMap = frames.reduce((acc, frame) => {
-      acc[frame.name] = frame.url;
+      acc[frame.id + '_' + frame.name] = 'http://localhost:8000' + frame.url;
       return acc;
     }, {});
     setAllFrames(framesMap);
@@ -46,28 +58,33 @@ const App = () => {
         <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
           Video Frame Extractor
         </h1>
-        {!isProcessingComplete ? (
-          <FileUpload onUploadSuccess={handleUploadSuccess} />
-        ) : (
-          <div className="text-center space-x-4">
-            <button
-              onClick={handleTryAnotherVideo}
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
-            >
-              Try Another Video
-            </button>
+
+        {/* Header with Buttons */}
+        <div className="flex justify-center space-x-4 mb-8">
+          <button
+            onClick={handleTryAnotherVideo}
+            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+          >
+            Try New Video
+          </button>
+          {hasFramesInIndexedDB && (
             <button
               onClick={handleViewAllFiles}
               className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300"
             >
-              View All Files
+              Show All Frames
             </button>
-          </div>
-        )}
-        {!showAllFrames && Object.keys(frames).length > 0 && (
+          )}
+        </div>
+
+        {/* File Upload Section */}
+        {!isProcessingComplete && !showAllFrames && <FileUpload onUploadSuccess={handleUploadSuccess} />}
+
+        {/* Display Frames */}
+        {isProcessingComplete && !showAllFrames && (
           <FrameDisplay frames={frames} uniqueId={uniqueId} />
         )}
-        {showAllFrames && <FrameDisplay frames={allFrames} uniqueId={uniqueId} />}
+        {showAllFrames && <FrameDisplay frames={allFrames} uniqueId={null} />}
       </div>
     </div>
   );
